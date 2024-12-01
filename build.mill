@@ -1,0 +1,10 @@
+package build
+
+import mill._, kotlinlib._
+
+object `package` extends RootModule with KotlinMavenModule {
+    def kotlinVersion = "2.0.20"
+    def mainClass = Some("com.grahamedgecombe.advent2024.AdventKt")
+
+    object test extends KotlinMavenTests with TestModule.Junit5
+}
