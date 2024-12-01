@@ -25,4 +25,10 @@ object Day1 : Puzzle<Pair<List<Int>, List<Int>>>(1) {
         val right = input.second.sorted()
         return left.zip(right).sumOf { abs(it.first - it.second) }
     }
+
+    override fun solvePart2(input: Pair<List<Int>, List<Int>>): Int {
+        return input.first.sumOf { left ->
+            left * input.second.count { right -> left == right }
+        }
+    }
 }
