@@ -35,6 +35,32 @@ object Day4 : Puzzle<CharGrid>(4) {
         return count
     }
 
+    override fun solvePart2(input: CharGrid): Int {
+        var count = 0
+
+        for (y in 0 until input.height) {
+            for (x in 0 until input.width) {
+                if (input[x, y] != 'A') {
+                    continue
+                }
+
+                val tl = input[x - 1, y - 1]
+                val tr = input[x + 1, y - 1]
+                val bl = input[x - 1, y + 1]
+                val br = input[x + 1, y + 1]
+
+                val cross1 = (tl == 'M' && br == 'S') || (tl == 'S' && br == 'M')
+                val cross2 = (tr == 'M' && bl == 'S') || (tr == 'S' && bl == 'M')
+
+                if (cross1 && cross2) {
+                    count++
+                }
+            }
+        }
+
+        return count
+    }
+
     private fun matches(grid: CharGrid, x: Int, y: Int, dir: Vector2): Boolean {
         for ((i, c) in "XMAS".withIndex()) {
             if (grid[x + dir.x * i, y + dir.y * i] != c) {
