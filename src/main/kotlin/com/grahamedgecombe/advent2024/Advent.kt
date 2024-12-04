@@ -3,6 +3,7 @@ package com.grahamedgecombe.advent2024
 import com.grahamedgecombe.advent2024.day1.Day1
 import com.grahamedgecombe.advent2024.day2.Day2
 import com.grahamedgecombe.advent2024.day3.Day3
+import com.grahamedgecombe.advent2024.day4.Day4
 import kotlin.time.Duration
 import kotlin.time.measureTimedValue
 
@@ -11,6 +12,7 @@ fun main(args: Array<String>) {
         Day1,
         Day2,
         Day3,
+        Day4,
     )
 
     val day = args.firstOrNull()?.toIntOrNull()
