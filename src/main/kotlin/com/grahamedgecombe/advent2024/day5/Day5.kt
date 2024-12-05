@@ -37,7 +37,8 @@ object Day5 : Puzzle<Day5.Input>(5) {
         var sum = 0
 
         for (update in input.updates) {
-            if (isSorted(input.rules, update)) {
+            val sorted = sort(input.rules, update)
+            if (update == sorted) {
                 sum += update[update.size / 2]
             }
         }
@@ -45,19 +46,26 @@ object Day5 : Puzzle<Day5.Input>(5) {
         return sum
     }
 
-    private fun isSorted(rules: Set<Pair<Int, Int>>, update: List<Int>): Boolean {
-        for ((i, page) in update.withIndex()) {
-            for ((before, after) in rules) {
-                if (page == before && after in update.slice(0 until i)) {
-                    return false
-                }
+    override fun solvePart2(input: Input): Int {
+        var sum = 0
 
-                if (page == after && before in update.slice(i + 1 until update.size)) {
-                    return false
-                }
+        for (update in input.updates) {
+            val sorted = sort(input.rules, update)
+            if (update != sorted) {
+                sum += sorted[sorted.size / 2]
             }
         }
 
-        return true
+        return sum
+    }
+
+    private fun sort(rules: Set<Pair<Int, Int>>, update: List<Int>): List<Int> {
+        return update.sortedWith { a, b ->
+            when {
+                Pair(a, b) in rules -> -1
+                Pair(b, a) in rules -> 1
+                else -> 0
+            }
+        }
     }
 }
