@@ -6,6 +6,19 @@ class CharGrid private constructor(
     val height: Int,
     private val default: Char,
 ) {
+    fun find(c: Char): Vector2? {
+        var i = 0
+        for (y in 0 until height) {
+            for (x in 0 until width) {
+                if (tiles[i++] == c) {
+                    return Vector2(x, y)
+                }
+            }
+        }
+
+        return null
+    }
+
     operator fun get(v: Vector2): Char {
         return get(v.x, v.y)
     }
