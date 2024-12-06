@@ -11,22 +11,54 @@ object Day6 : Puzzle<CharGrid>(6) {
     }
 
     override fun solvePart1(input: CharGrid): Int {
-        var position = input.find('^') ?: throw UnsolvableException()
+        val start = input.find('^') ?: throw UnsolvableException()
+        return getVisitedPositions(input, start).size
+    }
+
+    private fun getVisitedPositions(grid: CharGrid, start: Vector2): Set<Vector2> {
+        var position = start
         var dir = Vector2(0, -1)
 
         val visited = mutableSetOf<Vector2>()
 
-        while (position.x in 0 until input.width && position.y in 0 until input.height) {
+        while (position.x in 0 until grid.width && position.y in 0 until grid.height) {
             visited += position
 
             val next = position + dir
-            if (input[next] == '#') {
+            if (grid[next] == '#') {
                 dir = Vector2(-dir.y, dir.x)
             } else {
                 position = next
             }
         }
 
-        return visited.size
+        return visited
+    }
+
+    override fun solvePart2(input: CharGrid): Int {
+        val start = input.find('^') ?: throw UnsolvableException()
+        return getVisitedPositions(input, start).count { obstruction -> isLoop(input, start, obstruction) }
+    }
+
+    private fun isLoop(grid: CharGrid, start: Vector2, obstruction: Vector2): Boolean {
+        var position = start
+        var dir = Vector2(0, -1)
+
+        val visited = mutableSetOf<Pair<Vector2, Vector2>>()
+
+        while (position.x in 0 until grid.width && position.y in 0 until grid.height) {
+            if (!visited.add(Pair(position, dir))) {
+                return true
+            }
+
+            val next = position + dir
+            if (grid[next] == '#' || next == obstruction) {
+                dir = Vector2(-dir.y, dir.x)
+            } else {
+                position = next
+            }
+        }
+
+        return false
     }
 }
