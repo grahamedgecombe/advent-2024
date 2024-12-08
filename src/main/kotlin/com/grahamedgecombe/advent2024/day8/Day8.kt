@@ -6,7 +6,11 @@ import com.grahamedgecombe.advent2024.util.CharGrid
 import com.grahamedgecombe.advent2024.util.Vector2
 
 object Day8 : Puzzle<Input>(8) {
-    data class Input(val width: Int, val height: Int, val antennae: List<Antenna>)
+    data class Input(val width: Int, val height: Int, val antennae: List<Antenna>) {
+        operator fun contains(v: Vector2): Boolean {
+            return v.x in 0 until width && v.y in 0 until height
+        }
+    }
     data class Antenna(val position: Vector2, val frequency: Char)
 
     override fun parse(input: Sequence<String>): Input {
@@ -29,6 +33,14 @@ object Day8 : Puzzle<Input>(8) {
     }
 
     override fun solvePart1(input: Input): Int {
+        return solve(input, false)
+    }
+
+    override fun solvePart2(input: Input): Int {
+        return solve(input, true)
+    }
+
+    private fun solve(input: Input, all: Boolean): Int {
         val antinodes = mutableSetOf<Vector2>()
 
         for (a in input.antennae) {
@@ -38,12 +50,21 @@ object Day8 : Puzzle<Input>(8) {
                 }
 
                 val delta = a.position - b.position
-                antinodes += a.position + delta
+                if (all) {
+                    var antinode = a.position
+                    while (antinode in input) {
+                        antinodes += antinode
+                        antinode += delta
+                    }
+                } else {
+                    val antinode = a.position + delta
+                    if (antinode in input) {
+                        antinodes += antinode
+                    }
+                }
             }
         }
 
-        return antinodes.filter { (x, y) ->
-            x in 0 until input.width && y in 0 until input.height
-        }.size
+        return antinodes.size
     }
 }
