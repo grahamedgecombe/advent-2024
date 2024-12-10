@@ -28,6 +28,18 @@ object Day10 : Puzzle<CharGrid>(10) {
         return score
     }
 
+    override fun solvePart2(input: CharGrid): Int {
+        var score = 0
+
+        for ((position, height) in input) {
+            if (height == '0') {
+                score += dfs(input, position).count()
+            }
+        }
+
+        return score
+    }
+
     private fun dfs(grid: CharGrid, position: Vector2): Sequence<Vector2> = sequence {
         val height = grid[position].digitToInt()
         if (height == 9) {
