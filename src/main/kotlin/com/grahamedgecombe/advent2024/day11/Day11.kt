@@ -7,32 +7,50 @@ object Day11 : Puzzle<List<Long>>(11) {
         return input.single().split(' ').map(String::toLong)
     }
 
-    override fun solvePart1(input: List<Long>): Int {
-        var stones = input
-        repeat(25) {
-            stones = blink(stones)
-        }
-        return stones.size
+    override fun solvePart1(input: List<Long>): Long {
+        return solve(input, 25)
     }
 
-    private fun blink(stones: List<Long>): List<Long> {
-        val next = mutableListOf<Long>()
+    override fun solvePart2(input: List<Long>): Long {
+        return solve(input, 75)
+    }
 
-        for (stone in stones) {
+    private fun solve(input: List<Long>, blinks: Int): Long {
+        var frequencies = buildMap<Long, Long> {
+            for (stone in input) {
+                add(stone, 1)
+            }
+        }
+
+        repeat(blinks) {
+            frequencies = blink(frequencies)
+        }
+
+        return frequencies.values.sum()
+    }
+
+    private fun blink(frequencies: Map<Long, Long>): Map<Long, Long> {
+        val next = mutableMapOf<Long, Long>()
+
+        for ((stone, count) in frequencies) {
             if (stone == 0L) {
-                next += 1
+                next.add(1, count)
                 continue
             }
 
             val digits = stone.toString()
             if (digits.length % 2 == 0) {
-                next += digits.slice(0 until digits.length / 2).toLong()
-                next += digits.slice(digits.length / 2 until digits.length).toLong()
+                next.add(digits.slice(0 until digits.length / 2).toLong(), count)
+                next.add(digits.slice(digits.length / 2 until digits.length).toLong(), count)
             } else {
-                next += stone * 2024
+                next.add(stone * 2024, count)
             }
         }
 
         return next
+    }
+
+    private fun MutableMap<Long, Long>.add(k: Long, v: Long) {
+        this[k] = getOrDefault(k, 0) + v
     }
 }
