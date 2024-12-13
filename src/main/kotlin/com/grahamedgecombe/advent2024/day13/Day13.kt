@@ -48,7 +48,7 @@ object Day13 : Puzzle<List<Machine>>(13) {
             val b = (machine.a.y * machine.prize.x - machine.a.x * machine.prize.y) / d
             val a = (machine.prize.x - machine.b.x * b) / machine.a.x
 
-            if (a <= 100 && b <= 100) {
+            if (machine.a * a + machine.b * b == machine.prize && a in 0..100 && b in 0..100) {
                 sum += a * 3 + b
             }
         }

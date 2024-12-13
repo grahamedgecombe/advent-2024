@@ -7,7 +7,7 @@ class Day13Test {
     @Test
     fun testPart1() {
         assertEquals(480, Day13.solvePart1(TEST_INPUT))
-        assertEquals(38608, Day13.solvePart1(PROD_INPUT))
+        assertEquals(35997, Day13.solvePart1(PROD_INPUT))
     }
 
     private companion object {
