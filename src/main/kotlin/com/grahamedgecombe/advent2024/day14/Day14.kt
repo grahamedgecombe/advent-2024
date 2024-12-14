@@ -1,11 +1,15 @@
 package com.grahamedgecombe.advent2024.day14
 
 import com.grahamedgecombe.advent2024.Puzzle
+import com.grahamedgecombe.advent2024.UnsolvableException
 import com.grahamedgecombe.advent2024.util.Vector2
+import kotlin.math.abs
 
 object Day14 : Puzzle<List<Day14.Robot>>(14) {
     data class Robot(val position: Vector2, val velocity: Vector2)
 
+    private const val WIDTH = 101
+    private const val HEIGHT = 103
     private val REGEX = Regex("p=([0-9]+),([0-9]+) v=(-?[0-9]+),(-?[0-9]+)")
 
     override fun parse(input: Sequence<String>): List<Robot> {
@@ -17,10 +21,43 @@ object Day14 : Puzzle<List<Day14.Robot>>(14) {
     }
 
     override fun solvePart1(input: List<Robot>): Int {
-        return solve(input, 101, 103)
+        return solve(input, WIDTH, HEIGHT)
     }
 
-    fun solve(input: List<Robot>, width: Int, height: Int): Int {
+    override fun solvePart2(input: List<Robot>): Int {
+        for (n in 0 until WIDTH * HEIGHT) {
+            val positions = mutableSetOf<Vector2>()
+
+            for (robot in input) {
+                val position = robot.position + robot.velocity * n
+
+                val x = ((position.x % WIDTH) + WIDTH) % WIDTH
+                val y = ((position.y % HEIGHT) + HEIGHT) % HEIGHT
+
+                positions += Vector2(x, y)
+            }
+
+            var score = 0
+
+            for (a in positions) {
+                for (b in positions) {
+                    if (a.x == b.x && abs(a.y - b.y) == 1) {
+                        score++
+                    } else if (a.y == b.y && abs(a.x - b.x) == 1) {
+                        score++
+                    }
+                }
+            }
+
+            if (score >= 300) {
+                return n
+            }
+        }
+
+        throw UnsolvableException()
+    }
+
+    internal fun solve(input: List<Robot>, width: Int, height: Int): Int {
         var topLeft = 0
         var topRight = 0
         var bottomLeft = 0

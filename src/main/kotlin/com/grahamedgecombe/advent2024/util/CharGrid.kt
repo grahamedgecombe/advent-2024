@@ -6,6 +6,10 @@ class CharGrid private constructor(
     val height: Int,
     private val default: Char,
 ) : Iterable<Pair<Vector2, Char>> {
+    constructor(width: Int, height: Int, default: Char) : this(CharArray(width * height) {
+        default
+    }, width, height, default)
+
     fun find(c: Char): Vector2? {
         var i = 0
         for (y in 0 until height) {
@@ -29,6 +33,34 @@ class CharGrid private constructor(
         } else {
             default
         }
+    }
+
+    operator fun set(x: Int, y: Int, c: Char) {
+        if (x in 0 until width && y in 0 until height) {
+            tiles[y * width + x] = c
+        }
+    }
+
+    operator fun set(v: Vector2, c: Char) {
+        return set(v.x, v.y, c)
+    }
+
+    fun fill(c: Char) {
+        tiles.fill(c)
+    }
+
+    override fun toString(): String {
+        val builder = StringBuilder()
+
+        var i = 0
+        for (y in 0 until height) {
+            for (x in 0 until width) {
+                builder.append(tiles[i++])
+            }
+            builder.append('\n')
+        }
+
+        return builder.toString()
     }
 
     override fun iterator(): Iterator<Pair<Vector2, Char>> {
