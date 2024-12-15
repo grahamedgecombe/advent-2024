@@ -6,6 +6,7 @@ import com.grahamedgecombe.advent2024.day11.Day11
 import com.grahamedgecombe.advent2024.day12.Day12
 import com.grahamedgecombe.advent2024.day13.Day13
 import com.grahamedgecombe.advent2024.day14.Day14
+import com.grahamedgecombe.advent2024.day15.Day15
 import com.grahamedgecombe.advent2024.day2.Day2
 import com.grahamedgecombe.advent2024.day3.Day3
 import com.grahamedgecombe.advent2024.day4.Day4
@@ -33,6 +34,7 @@ fun main(args: Array<String>) {
         Day12,
         Day13,
         Day14,
+        Day15,
     )
 
     val day = args.firstOrNull()?.toIntOrNull()

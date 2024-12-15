@@ -6,6 +6,7 @@ class CharGrid private constructor(
     val height: Int,
     private val default: Char,
 ) : Iterable<Pair<Vector2, Char>> {
+    constructor(grid: CharGrid) : this(grid.tiles.copyOf(), grid.width, grid.height, grid.default)
     constructor(width: Int, height: Int, default: Char) : this(CharArray(width * height) {
         default
     }, width, height, default)
