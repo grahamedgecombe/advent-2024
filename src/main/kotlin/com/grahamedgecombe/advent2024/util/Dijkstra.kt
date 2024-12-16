@@ -16,12 +16,12 @@ object Dijkstra {
     }
 
     fun <T : Node<T>> search(roots: Iterable<T>): Sequence<Path<T>> {
-        val distance = mutableMapOf<T, Int>()
-        val queue = PriorityQueue(compareBy(distance::get))
-        val parents = mutableMapOf<T, T>()
+        val distances = mutableMapOf<T, Int>()
+        val queue = PriorityQueue(compareBy(distances::get))
+        val parents = mutableMapOf<T, MutableSet<T>>()
 
         for (root in roots) {
-            distance[root] = 0
+            distances[root] = 0
             queue += root
         }
 
@@ -29,34 +29,43 @@ object Dijkstra {
             while (true) {
                 val current = queue.poll() ?: break
                 if (current.isGoal) {
-                    val path = mutableListOf<T>()
-
-                    var node: T? = current
-                    while (node != null) {
-                        path += node
-                        node = parents[node]
-                    }
-
-                    path.reverse()
-                    yield(Path(path, distance[current]!!))
+                    yieldAll(paths(parents, listOf(current), current, distances[current]!!))
                 }
 
                 for ((neighbour, length) in current.neighbours) {
-                    val alt = distance[current]!! + length
-                    if (alt < distance.getOrDefault(neighbour, Int.MAX_VALUE)) {
-                        distance[neighbour] = alt
+                    val alt = distances[current]!! + length
+                    val distance = distances.getOrDefault(neighbour, Int.MAX_VALUE)
+                    if (alt > distance) {
+                        continue
+                    }
 
-                        /*
-                         * TODO(gpe): find an efficient way to remove an item
-                         * from a PriorityQueue to reduce the number of nodes
-                         * we have to visit.
-                         */
-                        queue += neighbour
+                    /*
+                     * TODO(gpe): find an efficient way to remove an item
+                     * from a PriorityQueue to reduce the number of nodes
+                     * we have to visit.
+                     */
+                    queue += neighbour
 
-                        parents[neighbour] = current
+                    if (alt < distance) {
+                        distances[neighbour] = alt
+                        parents[neighbour] = mutableSetOf(current)
+                    } else {
+                        parents.getOrPut(neighbour, ::mutableSetOf) += current
                     }
                 }
             }
+        }
+    }
+
+    private fun <T : Node<T>> paths(parents: Map<T, Set<T>>, path: List<T>, node: T, distance: Int): Sequence<Path<T>> = sequence {
+        val nodes = parents[node]
+        if (nodes == null || nodes.isEmpty()) {
+            yield(Path(path.reversed(), distance))
+            return@sequence
+        }
+
+        for (parent in nodes) {
+            yieldAll(paths(parents, path + parent, parent, distance))
         }
     }
 }

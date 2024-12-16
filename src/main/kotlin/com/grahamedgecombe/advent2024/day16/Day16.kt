@@ -7,6 +7,8 @@ import com.grahamedgecombe.advent2024.util.CharGrid
 import com.grahamedgecombe.advent2024.util.Vector2
 
 object Day16 : Puzzle<CharGrid>(16) {
+    private val EAST = Vector2(1, 0)
+
     data class Node(val grid: CharGrid, val position: Vector2, val direction: Vector2) : Dijkstra.Node<Node> {
         override val isGoal: Boolean
             get() = grid[position] == 'E'
@@ -46,7 +48,27 @@ object Day16 : Puzzle<CharGrid>(16) {
 
     override fun solvePart1(input: CharGrid): Int {
         val start = input.find('S') ?: throw UnsolvableException()
-        val path = Dijkstra.search(Node(input, start, Vector2(1, 0))).firstOrNull() ?: throw UnsolvableException()
+        val path = Dijkstra.search(Node(input, start, EAST)).firstOrNull() ?: throw UnsolvableException()
         return path.distance
+    }
+
+    override fun solvePart2(input: CharGrid): Int {
+        val start = input.find('S') ?: throw UnsolvableException()
+        val tiles = mutableSetOf<Vector2>()
+        var best: Int? = null
+
+        for (path in Dijkstra.search(Node(input, start, EAST))) {
+            if (best == null) {
+                best = path.distance
+            }
+
+            if (best == path.distance) {
+                for (node in path.nodes) {
+                    tiles += node.position
+                }
+            }
+        }
+
+        return tiles.size
     }
 }
