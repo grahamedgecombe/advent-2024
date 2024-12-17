@@ -6,16 +6,16 @@ import com.grahamedgecombe.advent2024.day17.Day17.Input
 
 object Day17 : Puzzle<Input>(17) {
     data class Input(
-        val a: Int,
-        val b: Int,
-        val c: Int,
+        val a: Long,
+        val b: Long,
+        val c: Long,
         val program: List<Int>,
     )
 
-    class Computer private constructor(
-        private var a: Int,
-        private var b: Int,
-        private var c: Int,
+    class Computer(
+        private var a: Long,
+        private var b: Long,
+        private var c: Long,
         private val program: List<Int>,
     ) {
         constructor(input: Input) : this(input.a, input.b, input.c, input.program)
@@ -30,24 +30,24 @@ object Day17 : Puzzle<Input>(17) {
                 ip += 2
 
                 when (opcode) {
-                    OPCODE_ADV -> a = a shr combo(operand)
-                    OPCODE_BXL -> b = b xor operand
+                    OPCODE_ADV -> a = a shr combo(operand).toInt()
+                    OPCODE_BXL -> b = b xor operand.toLong()
                     OPCODE_BST -> b = combo(operand) and 7
-                    OPCODE_JNZ -> if (a != 0) {
+                    OPCODE_JNZ -> if (a != 0L) {
                         ip = operand
                     }
                     OPCODE_BXC -> b = b xor c
-                    OPCODE_OUT -> yield(combo(operand) and 7)
-                    OPCODE_BDV -> b = a shr combo(operand)
-                    OPCODE_CDV -> c = a shr combo(operand)
+                    OPCODE_OUT -> yield(combo(operand).toInt() and 7)
+                    OPCODE_BDV -> b = a shr combo(operand).toInt()
+                    OPCODE_CDV -> c = a shr combo(operand).toInt()
                     else -> throw UnsolvableException()
                 }
             }
         }
 
-        private fun combo(operand: Int): Int {
+        private fun combo(operand: Int): Long {
             return when (operand) {
-                OPERAND_0, OPERAND_1, OPERAND_2, OPERAND_3 -> operand
+                OPERAND_0, OPERAND_1, OPERAND_2, OPERAND_3 -> operand.toLong()
                 OPERAND_A -> a
                 OPERAND_B -> b
                 OPERAND_C -> c
@@ -79,9 +79,9 @@ object Day17 : Puzzle<Input>(17) {
     private const val PROGRAM_PREFIX = "Program: "
 
     override fun parse(input: Sequence<String>): Input {
-        var a = 0
-        var b = 0
-        var c = 0
+        var a = 0L
+        var b = 0L
+        var c = 0L
 
         val it = input.iterator()
         while (it.hasNext()) {
@@ -89,9 +89,9 @@ object Day17 : Puzzle<Input>(17) {
 
             val (reg, value) = m.destructured
             when (reg) {
-                "A" -> a = value.toInt()
-                "B" -> b = value.toInt()
-                "C" -> c = value.toInt()
+                "A" -> a = value.toLong()
+                "B" -> b = value.toLong()
+                "C" -> c = value.toLong()
             }
         }
 
@@ -114,5 +114,51 @@ object Day17 : Puzzle<Input>(17) {
         return Computer(input).evaluate()
             .map(Int::toString)
             .joinToString(",")
+    }
+
+    override fun solvePart2(input: Input): Long {
+        /*
+         * Decompiled version of my input:
+         *
+         *     do {
+         *         b = a % 8
+         *         b = b xor 5
+         *         c = a shr b
+         *         a = a / 8
+         *         b = b xor c
+         *         b = b xor 6
+         *         yield(b % 8)
+         *     } while (a != 0)
+         *
+         * This is a bit like itoa(), except with some extra XOR-based
+         * encryption on top. The tricky part is that while we mostly operate
+         * on 3 bits of A at a time, C can use up to 11 bits of A - meaning
+         * more than one input could produce the same output digit in each
+         * position.
+         *
+         * So rather than considering one possible value of B for each output
+         * digit, we have to support multiple possibilities with recursion.
+         */
+        return solve(input.program, input.program.reversed(), 0)
+    }
+
+    private fun solve(program: List<Int>, expected: List<Int>, a: Long): Long {
+        if (expected.isEmpty()) {
+            return a
+        }
+
+        val head = expected.first()
+        val tail = expected.slice(1 until expected.size)
+        var min = Long.MAX_VALUE
+
+        for (digit in 0..7) {
+            val nextA = a * 8 + digit
+            val output = Computer(nextA, 0, 0, program).evaluate().first()
+            if (output == head) {
+                min = minOf(min, solve(program, tail, nextA))
+            }
+        }
+
+        return min
     }
 }
