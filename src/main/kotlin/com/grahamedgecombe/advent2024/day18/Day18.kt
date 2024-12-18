@@ -12,6 +12,8 @@ object Day18 : Puzzle<List<Vector2>>(18) {
         Vector2(0, -1),
         Vector2(0, 1),
     )
+    private val ORIGIN = Vector2(0, 0)
+    private val DESTINATION = Vector2(70, 70)
 
     override fun parse(input: Sequence<String>): List<Vector2> {
         return input.map { line ->
@@ -21,7 +23,7 @@ object Day18 : Puzzle<List<Vector2>>(18) {
     }
 
     override fun solvePart1(input: List<Vector2>): Int {
-        return solvePart1(input, 1024, Vector2(70, 70))
+        return solvePart1(input, 1024, DESTINATION)
     }
 
     data class Node(
@@ -58,8 +60,22 @@ object Day18 : Puzzle<List<Vector2>>(18) {
     }
 
     fun solvePart1(input: List<Vector2>, n: Int, destination: Vector2): Int {
-        val path = Bfs.search(Node(input.slice(0 until n).toSet(), destination, Vector2(0, 0)))
+        val path = Bfs.search(Node(input.slice(0 until n).toSet(), destination, ORIGIN))
             .firstOrNull() ?: throw UnsolvableException()
         return path.size - 1
+    }
+
+    override fun solvePart2(input: List<Vector2>): String {
+        return solvePart2(input, DESTINATION)
+    }
+
+    fun solvePart2(input: List<Vector2>, destination: Vector2): String {
+        for (i in 0 until input.size) {
+            if (Bfs.search(Node(input.slice(0 until i).toSet(), destination, ORIGIN)).none()) {
+                return input[i - 1].toString()
+            }
+        }
+
+        throw UnsolvableException()
     }
 }

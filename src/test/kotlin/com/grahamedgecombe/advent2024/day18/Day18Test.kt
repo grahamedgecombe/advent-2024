@@ -7,11 +7,18 @@ import org.junit.jupiter.api.Test
 class Day18Test {
     @Test
     fun testPart1() {
-        assertEquals(22, Day18.solvePart1(TEST_INPUT, 12, Vector2(6, 6)))
+        assertEquals(22, Day18.solvePart1(TEST_INPUT, 12, TEST_DESTINATION))
         assertEquals(326, Day18.solvePart1(PROD_INPUT))
     }
 
+    @Test
+    fun testPart2() {
+        assertEquals("6,1", Day18.solvePart2(TEST_INPUT, TEST_DESTINATION))
+        assertEquals("18,62", Day18.solvePart2(PROD_INPUT))
+    }
+
     private companion object {
+        private val TEST_DESTINATION = Vector2(6, 6)
         private val TEST_INPUT = Day18.parse("""
             5,4
             4,2

@@ -12,4 +12,8 @@ data class Vector2(val x: Int, val y: Int) {
     operator fun times(n: Int): Vector2 {
         return Vector2(x * n, y * n)
     }
+
+    override fun toString(): String {
+        return "$x,$y"
+    }
 }
