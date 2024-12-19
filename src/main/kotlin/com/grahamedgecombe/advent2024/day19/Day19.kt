@@ -24,27 +24,32 @@ object Day19 : Puzzle<Input>(19) {
     }
 
     override fun solvePart1(input: Input): Int {
-        return input.designs.count { design -> isValid(input.patterns, design, mutableMapOf()) }
+        return input.designs.count { design -> countValid(input.patterns, design, mutableMapOf()) > 0 }
     }
 
-    private fun isValid(patterns: List<String>, design: String, cache: MutableMap<String, Boolean>): Boolean {
+    override fun solvePart2(input: Input): Long {
+        return input.designs.sumOf { design -> countValid(input.patterns, design, mutableMapOf()) }
+    }
+
+    private fun countValid(patterns: List<String>, design: String, cache: MutableMap<String, Long>): Long {
         if (design.isEmpty()) {
-            return true
+            return 1
         }
 
-        val valid = cache[design]
-        if (valid != null) {
-            return valid
+        var count = cache[design]
+        if (count != null) {
+            return count
         }
+
+        count = 0
 
         for (pattern in patterns) {
-            if (design.startsWith(pattern) && isValid(patterns, design.substring(pattern.length), cache)) {
-                cache[design] = true
-                return true
+            if (design.startsWith(pattern)) {
+                count += countValid(patterns, design.substring(pattern.length), cache)
             }
         }
 
-        cache[design] = false
-        return false
+        cache[design] = count
+        return count
     }
 }
