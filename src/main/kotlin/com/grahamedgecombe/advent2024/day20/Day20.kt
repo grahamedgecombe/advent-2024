@@ -6,7 +6,7 @@ import com.grahamedgecombe.advent2024.util.CharGrid
 import com.grahamedgecombe.advent2024.util.Vector2
 import kotlin.math.abs
 
-object Day20 : Puzzle<CharGrid>(20) {
+object Day20 : Puzzle<Map<Vector2, Int>>(20) {
     private val DIRECTIONS = setOf(
         Vector2(-1, 0),
         Vector2(1, 0),
@@ -14,19 +14,26 @@ object Day20 : Puzzle<CharGrid>(20) {
         Vector2(0, 1),
     )
 
-    override fun parse(input: Sequence<String>): CharGrid {
-        return CharGrid.parse(input.toList(), '#')
+    override fun parse(input: Sequence<String>): Map<Vector2, Int> {
+        return race(CharGrid.parse(input.toList(), '#'))
     }
 
-    override fun solvePart1(input: CharGrid): Int {
-        val times = race(input)
+    override fun solvePart1(input: Map<Vector2, Int>): Int {
+        return solve(input, 2)
+    }
+
+    override fun solvePart2(input: Map<Vector2, Int>): Int {
+        return solve(input, 20)
+    }
+
+    private fun solve(times: Map<Vector2, Int>, maxCheat: Int): Int {
         var count = 0
 
         for ((u, t1) in times) {
-            for (dy in -2..2) {
-                for (dx in -2..2) {
+            for (dy in -maxCheat..maxCheat) {
+                for (dx in -maxCheat..maxCheat) {
                     val dist = abs(dx) + abs(dy)
-                    if (dist > 2) {
+                    if (dist > maxCheat) {
                         continue
                     }
 
