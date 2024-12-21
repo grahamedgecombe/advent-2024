@@ -22,7 +22,6 @@ object Day21 : Puzzle<List<String>>(21) {
         " ^A",
         "<v>",
     ), ' '))
-    private const val ROBOTS = 3
 
     private fun findShortestPaths(keypad: CharGrid): Map<Pair<Char, Char>, Set<String>> {
         return buildMap {
@@ -93,37 +92,63 @@ object Day21 : Puzzle<List<String>>(21) {
         return input.toList()
     }
 
-    private fun minLength(input: String): Int {
-        return minLength(ROBOTS, "A$input", "")
+    private data class Key(val robot: Int, val from: Char, val to: Char)
+
+    private fun minLength(input: String, robots: Int): Long {
+        val cache = mutableMapOf<Key, Long>()
+
+        var len = 0L
+        for ((a, b) in "A$input".zipWithNext()) {
+            len += minLength(robots, robots, a, b, cache)
+        }
+        return len
     }
 
     private fun minLength(
         robot: Int,
-        input: String,
-        output: String
-    ): Int {
+        robots: Int,
+        from: Char,
+        to: Char,
+        cache: MutableMap<Key, Long>,
+    ): Long {
         if (robot == 0) {
-            return input.length - 1
-        } else if (input.length < 2) {
-            return minLength(robot - 1, "A$output", "")
+            return 1
         }
 
-        val move = Pair(input[0], input[1])
-        val keypad = if (robot == ROBOTS) NUMERIC_KEYPAD else DIRECTIONAL_KEYPAD
-        val tail = input.substring(1)
+        val key = Key(robot, from, to)
+
+        var best = cache[key]
+        if (best != null) {
+            return best
+        }
+
+        val move = Pair(from, to)
+        val keypad = if (robot == robots) NUMERIC_KEYPAD else DIRECTIONAL_KEYPAD
 
         val sequences = keypad[move] ?: throw UnsolvableException()
 
-        var best = Int.MAX_VALUE
-        for (sequence in sequences) {
-            best = minOf(best, minLength(robot, tail, output + sequence + "A"))
+        best = sequences.minOf { sequence ->
+            var len = 0L
+            for ((a, b) in "A${sequence}A".zipWithNext()) {
+                len += minLength(robot - 1, robots, a, b, cache)
+            }
+            len
         }
+        cache[key] = best
         return best
     }
 
-    override fun solvePart1(input: List<String>): Int {
+    override fun solvePart1(input: List<String>): Long {
+        return solve(input, 3)
+    }
+
+    override fun solvePart2(input: List<String>): Long {
+        return solve(input, 26)
+    }
+
+    private fun solve(input: List<String>, robots: Int): Long {
         return input.sumOf { code ->
-            minLength(code) * code.filter(Char::isDigit).toInt()
+            minLength(code, robots) * code.filter(Char::isDigit).toLong()
         }
     }
 }
