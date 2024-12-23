@@ -10,6 +10,12 @@ class Day23Test {
         assertEquals(1098, Day23.solvePart1(PROD_INPUT))
     }
 
+    @Test
+    fun testPart2() {
+        assertEquals("co,de,ka,ta", Day23.solvePart2(TEST_INPUT))
+        assertEquals("ar,ep,ih,ju,jx,le,ol,pk,pm,pp,xf,yu,zg", Day23.solvePart2(PROD_INPUT))
+    }
+
     private companion object {
         private val TEST_INPUT = Day23.parse("""
             kh-tc
